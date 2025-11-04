@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compuertas Lógicas Interactivas (7 Gates)</title>
+    <style>
+        /* =======================================
+           1. ESTILOS GENERALES Y VARIABLES
+           ======================================= */
+        :root {
+            --color-principal: #007bff; /* Azul */
+            --color-secundario: #6c757d; /* Gris */
+            --color-fondo: #f4f6f9; /* Fondo claro */
+            --color-tarjeta: #ffffff;
+            --color-texto: #343a40;
+            --color-success: #28a745; /* Verde (Salida 1) */
+            --color-danger: #dc3545; /* Rojo (Salida 0) */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 0;
+        }
+
+        /* =======================================
+           2. ENCABEZADO Y TARJETAS
+           ======================================= */
+        header {
+            background-color: var(--color-principal);
+            color: white;
+            padding: 50px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.8em;
+        }
+
+        .gate-card {
+            background-color: var(--color-tarjeta);
+            border-left: 5px solid var(--color-principal);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .gate-card h2 {
+            color: var(--color-texto);
+            font-size: 1.8em;
+            border-bottom: 1px solid var(--color-secundario);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+
+        /* =======================================
+           3. SÍMBOLO Y TABLA DE VERDAD
+           ======================================= */
+        .gate-details {
+            display: flex;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        .gate-details > div {
+            flex: 1;
+            padding: 15px;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+        }
+
+        .logic-symbol h3, .truth-table h3 {
+            color: var(--color-secundario);
+            margin-top: 0;
+        }
+
+        .truth-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .truth-table th, .truth-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .logic-symbol img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* =======================================
+           4. SECCIÓN INTERACTIVA (SIMULADOR)
+           ======================================= */
+        .interactive-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 30px 20px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            margin-top: 30px;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            text-align: center;
+        }
+        
+        .input-btn {
+            padding: 12px 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--color-danger);
+            color: white;
+            transition: background-color 0.3s, transform 0.1s;
+            width: 90px;
+            margin-top: 5px;
+        }
+
+        .input-btn.active {
+            background-color: var(--color-success);
+        }
+        
+        .output-display {
+            font-size: 2.2em;
+            font-weight: bold;
+            padding: 20px;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            background-color: var(--color-danger);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: background-color 0.3s;
+        }
+
+        .output-display.high {
+            background-color: var(--color-success);
+        }
+
+        /* =======================================
+           5. ESTILOS DE CRÉDITOS (NUEVO)
+           ======================================= */
+        #credits {
+            position: fixed; /* Fijo en la pantalla */
+            bottom: 10px; /* 10px desde abajo */
+            right: 10px; /* 10px desde la derecha */
+            background-color: var(--color-tarjeta);
+            border: 1px solid var(--color-secundario);
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 0.8em;
+            color: var(--color-texto);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            text-align: right;
+            line-height: 1.4;
+            z-index: 1000; /* Asegura que esté por encima de otros elementos */
+        }
+        #credits strong {
+            color: var(--color-principal);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Circuitos Digitales: 7 Compuertas Lógicas Fundamentales 💡</h1>
+        <p>Con números de serie: 74LS08, 74LS00, 74LS32, 74LS02, 74LS86, 74LS266, 74LS04.</p>
+    </header>
+
+    <div class="container">
+
+        <div class="gate-card">
+            <h2>1. Compuerta AND (74LS08)</h2>
+            <p>La compuerta AND solo produce una salida ALTA (1) si TODAS sus entradas son ALTAS (1). En cualquier otro caso, la salida es BAJA (0).</p>
+            <div class="gate-details">
+                <div class="logic-symbol">
+                    <h3>Símbolo y Función</h3>
+                    <img src="https://via.placeholder.com/250x120?text=Simbolo+AND" alt="Símbolo de la compuerta AND">
+                    <p>Función Lógica: El resultado es 1, SÍ Y SOLO SÍ, ambas entradas son 1.</p>
+                </div>
+                <div class="truth-table">
+                    <h3>Tabla de Verdad</h3>
+                    <table>
+                        <thead>
+                            <tr><th>A</th><th>B</th><th>Salida (S)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>0</td><td>0</td><td>0</td></tr>
+                            <tr><td>0</td><td>1</td><td>0</td></tr>
+                            <tr><td>1</td><td>0</td><td>0</td></tr>
+                            <tr><td>1</td><td>1</td><td>1</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3>Simulador Interactivo</h3>
+            <div class="interactive-section" data-gate="AND">
+                <div class="input-group">
+                    <label>Entrada A</label>
+                    <button class="input-btn" data-input="A" data-value="0">0</button>
+                </div>
+                <span style="font-size: 3em; font-weight: bold;">&amp;</span>
+                <div class="input-group">
+                    <label>Entrada B</label>
+                    <button class="input-btn" data-input="B" data-value="0">0</button>
+                </div>
+                <span style="font-size: 3em;">=</span>
+                <div class="output-group">
+                    <label>Salida S</label>
+                    <div class="output-display" id="output-AND">0</div>
+                </div>
+            </div>
+            <p style="margin-top: 15px; font-style: italic; color: var(--color-secundario);">Ejemplo práctico: Una alarma se activa (1) solo si el sensor de la puerta (A=1) Y el sensor de la ventana (B=1) están activos simultáneamente.</p>
+        </div>
+
+        <div class="gate-card">
+            <h2>2. Compuerta NAND (74LS00)</h2>
+            <p>La compuerta NAND es la inversa de la compuerta AND. Su salida es BAJA (0) solo si TODAS sus entradas son ALTAS (1). En cualquier otro caso, la salida es ALTA (1).</p>
+            <div class="gate-details">
+                <div class="logic-symbol">
+                    <h3>Símbolo y Función</h3>
+                    <img src="https://via.placeholder.com/250x120?text=Simbolo+NAND" alt="Símbolo de la compuerta NAND">
+                    <p>Función Lógica: El resultado es 0, SÍ Y SOLO SÍ, ambas entradas son 1.</p>
+                </div>
+                <div class="truth-table">
+                    <h3>Tabla de Verdad</h3>
+                    <table>
+                        <thead>
+                            <tr><th>A</th><th>B</th><th>Salida (S)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>0</td><td>0</td><td>1</td></tr>
+                            <tr><td>0</td><td>1</td><td>1</td></tr>
+                            <tr><td>1</td><td>0</td><td>1</td></tr>
+                            <tr><td>1</td><td>1</td><td>0</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3>Simulador Interactivo</h3>
+            <div class="interactive-section" data-gate="NAND">
+                <div class="input-group">
+                    <label>Entrada A</label>
+                    <button class="input-btn" data-input="A" data-value="0">0</button>
+                </div>
+                <span style="font-size: 3em; font-weight: bold;">&amp;</span><span style="font-size: 1.5em; vertical-align: top;">&macr;</span>
+                <div class="input-group">
+                    <label>Entrada B</label>
+                    <button class="input-btn" data-input="B" data-value="0">0</button>
+                </div>
+                <span style="font-size: 3em;">=</span>
+                <div class="output-group">
+                    <label>Salida S</label>
+                    <div class="output-display" id="output-NAND">1</div>
+                </div>
+            </div>
+            <p style="margin-top: 15px; font-style: italic; color: var(--color-secundario);">Ejemplo práctico: La luz de advertencia (1) permanece apagada (0) solo si el sistema principal (A=1) Y el sistema de respaldo (B=1) están funcionando.</p>
+        </div>
+        
+        <div class="gate-card">
+            <h2>3. Compuerta OR (74LS32)</h2>
+            <p>La compuerta OR produce una salida ALTA (1) si AL MENOS UNA de sus entradas es ALTA (1). Solo si todas las entradas son BAJAS (0), la salida será BAJA (0).</p>
+            <div class="gate-details">
+                <div class="logic-symbol">
+                    <h3>Símbolo y Función</h3>
+                    <img src="https://via.placeholder.com/250x120?text=Simbolo+OR" alt="Símbolo de la compuerta OR">
+                    <p>Función Lógica: El resultado es 1, SÍ O SÍ, alguna de las entradas es 1.</p>
+                </div>
+                <div class="truth-table">
+                    <h3>Tabla de Verdad</h3>
+                    <table>
+                        <thead>
+                            <tr><th>A</th><th>B</th><th>Salida (S)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>0</td><td>0</td><td>0</td></tr>
+                            <tr><td>0</td><td>1</td><td>1</td></tr>
+                            <tr><td>1</td><td>0</td><td>1</td></tr>
+                            <tr><td>1</td><td>1</td><td>1</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3>Simulador Interactivo</h3>
+            <div class="interactive-section" data-gate="OR">
+                <div class="input-group">
+                    <label>Entrada A</label>
+                    <button class="input-btn" data-input="A" data-value="0">0</button>
+                </div>
+                <span style="font-size: 2.5em; font-weight: bold;">+</span>
+                <div class="input-group">
+                    <label>Entrada B</label>
+                    <button class="input-btn" data-input="B" data-value="0">0</button>
+                </div>
+                <span style="font-size: 3em;">=</span>
+                <div class="output-group">
+                    <label>Salida S</label>
+                    <div class="output-display" id="output-OR">0</div>
+                </div>
+            </div>
+            <p style="margin-top: 15px; font-style: italic; color: var(--color-secundario);">Ejemplo práctico: La luz de emergencia (1) se enciende si falla la energía principal (A=1) O si alguien presiona el botón manual (B=1).</p>
+        </div>
+        
+        <div class="gate-card">
+            <h2>4. Compuerta NOR (74LS02)</h2>
+            <p>La compuerta NOR es la inversa de la compuerta OR. Su salida solo es ALTA (1) si AMBAS entradas son BAJAS (0). Si alguna entrada es ALTA (1), la salida es BAJA (0).</p>
+            <div class="gate-details">
+                <div class="logic-symbol">
+                    <h3>Símbolo y Función</h3>
+                    <img src="https://via.placeholder.com/250x120?text=Simbolo+NOR" alt="Símbolo de la compuerta NOR">
+                    <p>Función Lógica: El resultado es 1, SÍ Y SOLO SÍ, ambas entradas son 0.</p>
+                </div>
+                <div class="truth-table">
+                    <h3>Tabla de Verdad</h3>
+                    <table>
+                        <thead>
+                            <tr><th>A</th><th>B</th><th>Salida (S)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>0</td><td>0</td><td>1</td></tr>
+                            <tr><td>0</td><td>1</td><td>0</td></tr>
+                            <tr><td>1</td><td>0</td><td>0</td></tr>
+                            <tr><td>1</td><td>1</td><td>0</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3>Simulador Interactivo</h3>
+            <div class="interactive-section" data-gate="NOR">
+                <div class="input-group">
+                    <label>Entrada A</label>
+                    <button class="input-btn" data-input="A" data-value="0">0</button>
+                </div>
+                <span style="font-size: 2.5em; font-weight: bold;">+</span><span style="font-size: 1.5em; vertical-align: top;">&macr;</span>
+                <div class="input-group">
+                    <label>Entrada B</label>
+                    <button class="input-btn" data-input="B" data-value="0">0</button>
+                </div>
+                <span style="font-size: 3em;">=</span>
+                <div class="output-group">
+                    <label>Salida S</label>
+                    <div class="output-display" id="output-NOR">1</div>
+                </div>
+            </div>
+            <p style="margin-top: 15px; font-style: italic; color: var(--color-secundario);">Ejemplo práctico: Un sistema de refrigeración de emergencia (1) solo se activa si la temperatura (A=0) Y la presión (B=0) están por debajo de los límites seguros.</p>
+        </div>
+
+        <div class="gate-card">
+            <h2>5. Compuerta XOR (74LS86)</h2>
+            <p>La compuerta XOR produce una salida ALTA (1) si y solo si las entradas son DIFERENTES. Es decir, si solo una entrada es ALTA (1). Si ambas son iguales (0 y 0, o 1 y 1), la salida es BAJA (0).</p>
+            <div class="gate-details">
+                <div class="logic-symbol">
+                    <h3>Símbolo y Función</h3>
+                    <img src="https://via.placeholder.com/250x120?text=Simbolo+XOR" alt="Símbolo de la compuerta XOR">
+                    <p>Función Lógica: El resultado es 1, SÍ O SÍ, las entradas son diferentes.</p>
+                </div>
+                <div class="truth-table">
+                    <h3>Tabla de Verdad</h3>
+                    <table>
+                        <thead>
+                            <tr><th>A</th><th>B</th><th>Salida (S)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>0</td><td>0</td><td>0</td></tr>
+                            <tr><td>0</td><td>1</td><td>1</td></tr>
+                            <tr><td>1</td><td>0</td><td>1</td></tr>
+                            <tr><td>1</td><td>1</td><td>0</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3>Simulador Interactivo</h3>
+            <div class="interactive-section" data-gate="XOR">
+                <div class="input-group">
+                    <label>Entrada A</label>
+                    <button class="input-btn" data-input="A" data-value="0">0</button>
+                </div>
+                <span style="font-size: 2.5em; font-weight: bold;">&#8853;</span>
+                <div class="input-group">
+                    <label>Entrada B</label>
+                    <button class="input-btn" data-input="B" data-value="0">0</button>
+                </div>
+                <span style="font-size: 3em;">=</span>
+                <div class="output-group">
+                    <label>Salida S</label>
+                    <div class="output-display" id="output-XOR">0</div>
+                </div>
+            </div>
+            <p style="margin-top: 15px; font-style: italic; color: var(--color-secundario);">Ejemplo práctico: Un semáforo se activa (1) solo si recibe una señal de la vía 1 (A=1) O de la vía 2 (B=1), pero no de ambas (Baja prioridad).</p>
+        </div>
+
+        <div class="gate-card">
+            <h2>6. Compuerta XNOR (74LS266)</h2>
+            <p>La compuerta XNOR es la inversa de la compuerta XOR. Su salida es ALTA (1) si y solo si ambas entradas son IGUALES (0 y 0, o 1 y 1). Actúa como un comparador de igualdad.</p>
+            <div class="gate-details">
+                <div class="logic-symbol">
+                    <h3>Símbolo y Función</h3>
+                    <img src="https://via.placeholder.com/250x120?text=Simbolo+XNOR" alt="Símbolo de la compuerta XNOR">
+                    <p>Función Lógica: El resultado es 1, SÍ Y SOLO SÍ, las entradas son iguales.</p>
+                </div>
+                <div class="truth-table">
+                    <h3>Tabla de Verdad</h3>
+                    <table>
+                        <thead>
+                            <tr><th>A</th><th>B</th><th>Salida (S)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>0</td><td>0</td><td>1</td></tr>
+                            <tr><td>0</td><td>1</td><td>0</td></tr>
+                            <tr><td>1</td><td>0</td><td>0</td></tr>
+                            <tr><td>1</td><td>1</td><td>1</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3>Simulador Interactivo</h3>
+            <div class="interactive-section" data-gate="XNOR">
+                <div class="input-group">
+                    <label>Entrada A</label>
+                    <button class="input-btn" data-input="A" data-value="0">0</button>
+                </div>
+                <span style="font-size: 2.5em; font-weight: bold;">&#8853;</span><span style="font-size: 1.5em; vertical-align: top;">&macr;</span>
+                <div class="input-group">
+                    <label>Entrada B</label>
+                    <button class="input-btn" data-input="B" data-value="0">0</button>
+                </div>
+                <span style="font-size: 3em;">=</span>
+                <div class="output-group">
+                    <label>Salida S</label>
+                    <div class="output-display" id="output-XNOR">1</div>
+                </div>
+            </div>
+            <p style="margin-top: 15px; font-style: italic; color: var(--color-secundario);">Ejemplo práctico: Un sistema de validación (1) se activa solo si la clave de entrada (A) coincide exactamente con la clave de respaldo (B).</p>
+        </div>
+
+        <div class="gate-card">
+            <h2>7. Compuerta NOT (74LS04)</h2>
+            <p>La compuerta NOT es la más simple; solo tiene una entrada y una salida. La salida es siempre la INVERSA de la entrada.</p>
+            <div class="gate-details">
+                <div class="logic-symbol">
+                    <h3>Símbolo y Función</h3>
+                    <img src="https://via.placeholder.com/150x120?text=Simbolo+NOT" alt="Símbolo de la compuerta NOT" style="max-width: 60%;">
+                    <p>Función Lógica: Invierte la entrada. Si es 1, la salida es 0; si es 0, la salida es 1.</p>
+                </div>
+                <div class="truth-table">
+                    <h3>Tabla de Verdad</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Entrada (A)</th><th>Salida (S)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>0</td><td>1</td></tr>
+                            <tr><td>1</td><td>0</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3>Simulador Interactivo</h3>
+            <div class="interactive-section" data-gate="NOT">
+                <div class="input-group">
+                    <label>Entrada A</label>
+                    <button class="input-btn" data-input="A" data-value="0">0</button>
+                </div>
+                <span style="font-size: 3em; font-weight: bold;">&rarr;</span>
+                <div class="output-group">
+                    <label>Salida S</label>
+                    <div class="output-display" id="output-NOT">1</div>
+                </div>
+            </div>
+            <p style="margin-top: 15px; font-style: italic; color: var(--color-secundario);">Ejemplo práctico: Si la luz indicadora del motor (A) está encendida (1), la señal para el operador (S) es 'Apagado' (0). Si la luz (A) está apagada (0), la señal (S) es 'Encendido' (1).</p>
+        </div>
+        
+    </div>
+
+    <div id="credits">
+        Desarollado por:
+        <br>
+        Programador: **Jose Angel**
+        <br>
+        Diseñador PCB: **Andres Bayona**
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputButtons = document.querySelectorAll('.input-btn');
+
+            // --- Lógica de la Interacción ---
+            inputButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // 1. Alternar el estado del botón (0 <-> 1)
+                    const currentValue = parseInt(button.dataset.value);
+                    const newValue = 1 - currentValue;
+
+                    button.dataset.value = newValue;
+                    button.textContent = newValue;
+                    button.classList.toggle('active', newValue === 1);
+
+                    // 2. Ejecutar la lógica de la compuerta
+                    const gateSection = button.closest('.interactive-section');
+                    if (gateSection) {
+                        evaluateGate(gateSection);
+                    }
+                });
+            });
+
+            // --- Función Principal de Evaluación Booleana ---
+            function evaluateGate(gateSection) {
+                const gateType = gateSection.dataset.gate;
+                const outputElement = document.getElementById(`output-${gateType}`);
+                
+                // Obtener valores de entrada
+                const inputs = {};
+                gateSection.querySelectorAll('.input-btn').forEach(btn => {
+                    // Solo usa la entrada A para NOT
+                    if (gateType === 'NOT' && btn.dataset.input !== 'A') return;
+                    inputs[btn.dataset.input] = parseInt(btn.dataset.value);
+                });
+
+                let result;
+
+                switch (gateType) {
+                    case 'AND':
+                        // AND: 74LS08 (A * B)
+                        result = inputs.A * inputs.B;
+                        break;
+                    case 'NAND':
+                        // NAND: 74LS00 (NO (A * B))
+                        const andResult = inputs.A * inputs.B;
+                        result = 1 - andResult;
+                        break;
+                    case 'OR':
+                        // OR: 74LS32 ((A + B) >= 1)
+                        result = (inputs.A + inputs.B) >= 1 ? 1 : 0;
+                        break;
+                    case 'NOR':
+                        // NOR: 74LS02 (NO (A + B))
+                        const orResult = (inputs.A + inputs.B) >= 1 ? 1 : 0;
+                        result = 1 - orResult;
+                        break;
+                    case 'XOR':
+                        // XOR: 74LS86 (A != B)
+                        result = (inputs.A !== inputs.B) ? 1 : 0;
+                        break;
+                    case 'XNOR':
+                        // XNOR: 74LS266 (NO XOR -> A == B)
+                        result = (inputs.A === inputs.B) ? 1 : 0;
+                        break;
+                    case 'NOT':
+                        // NOT: 74LS04 (1 - A)
+                        result = 1 - inputs.A;
+                        break;
+                    default:
+                        result = 0;
+                }
+
+                // 3. Mostrar el resultado
+                outputElement.textContent = result;
+                outputElement.classList.toggle('high', result === 1);
+            }
+
+            // Inicializar la simulación con el estado por defecto
+            document.querySelectorAll('.interactive-section').forEach(evaluateGate);
+        });
+    </script>
+</body>
+</html>
